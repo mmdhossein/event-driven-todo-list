@@ -15,7 +15,16 @@ export class TodoItem {
     description: string
     @Prop()
     priority: number
+    @Prop({type:mongoose.Schema.Types.ObjectId})
+    _id
 
+
+    constructor(todoListId, title: string, description: string, priority: number) {
+        this.todoListId = todoListId;
+        this.title = title;
+        this.description = description;
+        this.priority = priority;
+    }
 }
 
 export type todoItemDocument = HydratedDocument<TodoItem>;
@@ -35,10 +44,12 @@ export class TodoList {
     userId: ObjectId
     @Prop({ref:TodoItem.name, type:mongoose.Schema.Types.ObjectId})
     @ApiProperty({type:[mongoose.Schema.Types.ObjectId]})
-    todoItems: Array<ObjectId> = []
+    todoItems: Array<any> = []
     @Prop({type:String})
     @ApiProperty()
     title: string
+    @Prop({type:mongoose.Schema.Types.ObjectId})
+    _id
 }
 
 export class TodoListDto {
@@ -56,4 +67,4 @@ export class TodoLists{
 }
 
 export type todoListDocument = HydratedDocument<TodoList>;
-export const TodoListSchema = SchemaFactory.createForClass(TodoList);
+export const TodoListSchema = SchemaFactory.createForClass(TodoList).index({_id:1, userId:1});

@@ -1,46 +1,47 @@
 import {ApiProperty} from "@nestjs/swagger";
 
 export class BaseTodoDto {
-
+    userId
 }
 
 export class DeleteTodoListDto extends BaseTodoDto {
     @ApiProperty()
-    id:string
+    id: string
 }
 
 export class CreateTodoListDto extends BaseTodoDto {
     @ApiProperty()
-    title:string
-    userName:string
-    userId
+    title: string
+    userName: string
 }
 
 export class UpdateTodoListDto extends BaseTodoDto {
     @ApiProperty()
-    id:string
+    id: string
     @ApiProperty()
-    title:string
+    title: string
 }
 
 export class DeleteTodoItemDto extends BaseTodoDto {
     @ApiProperty()
-    id:string
+    id: string
+    @ApiProperty()
+    todoListId
 }
 
 export class CreateTodoItemDto extends BaseTodoDto {
     @ApiProperty()
-    todoListId:string
+    todoListId: string
     @ApiProperty()
-    title:string
+    title: string
     @ApiProperty()
-    description:string
+    description: string
     @ApiProperty()
-    priority:string
+    priority: number
 }
 
-export class UpdateTodoItemDto extends BaseTodoDto {
-
+export class UpdateTodoItemDto extends CreateTodoItemDto {
+    id
 }
 
 export enum TodoCommands {

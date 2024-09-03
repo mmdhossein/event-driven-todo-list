@@ -1,5 +1,7 @@
 import {Prop} from "@nestjs/mongoose";
 import {ApiProperty} from "@nestjs/swagger";
+import * as mongoose from 'mongoose'
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 export class AuthDto {
     @Prop({type:String})
@@ -8,6 +10,8 @@ export class AuthDto {
     @Prop({type:String})
     @ApiProperty()
     password:string
+    @Prop({type:mongoose.Schema.Types.ObjectId})
+    _id
 
     constructor(userName: string, password: string) {
         this.userName = userName;
@@ -15,7 +19,6 @@ export class AuthDto {
     }
 }
 
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 export class AppContextData {
     user:AuthDto

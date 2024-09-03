@@ -3,10 +3,11 @@ import {Reflector} from "@nestjs/core";
 import {SetMetadata} from '@nestjs/common';
 import {JwtService} from "@nestjs/jwt";
 import {AppContextData} from "../../modules/auth/token/token.model";
+import {UserService} from "../../modules/auth/users/user.service";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-    constructor(private reflector: Reflector, private jwtService: JwtService) {
+    constructor(private reflector: Reflector, private jwtService: JwtService, private userService:UserService) {
     }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -25,6 +26,8 @@ export class RolesGuard implements CanActivate {
             appContext.user = await this.jwtService.verifyAsync(token, {
                 secret: '!21ASsig_nmenT',
             });//UserAuthBody
+            const user = await this.userService.findUser(appContext.user.userName)
+            appContext.user._id = user._id
             request['AppContextData'] = appContext
         } catch {
             throw new UnauthorizedException();

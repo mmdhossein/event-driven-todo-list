@@ -1,15 +1,15 @@
 import {
-    Body, Controller,
+    Body, Controller, Delete,
     Get,
     HttpCode,
     HttpStatus,
-    Post, UseGuards,
+    Post, Put, UseGuards,
 } from "@nestjs/common";
 import {ApiBearerAuth, ApiBody, ApiOkResponse} from "@nestjs/swagger";
 import {AppContext, AppContextData} from "../auth/token/token.model";
 import { TodoListDto, TodoLists} from "./todo.model";
 import {TodoService} from "./todo.service";
-import { CreateTodoListDto, TodoEventMessage} from "./todo.dto.model";
+import {CreateTodoListDto, TodoEventMessage, UpdateTodoListDto} from "./todo.dto.model";
 import {Public, RolesGuard} from "../../config/guard/guard.auth";
 import {Ctx, MessagePattern, NatsContext, Payload} from "@nestjs/microservices";
 
@@ -24,7 +24,7 @@ export class TodoController {
     @Get('list')
     @ApiOkResponse({type:TodoLists})
     async getUserUserData(@AppContext() appContext: AppContextData) {
-      const todos =  await  this.todoService.getTodoLists(appContext.user.userName);
+      const todos =  await  this.todoService.getTodoLists(appContext.user.userName,appContext.user._id);
       return new TodoLists(todos)
 
     }
@@ -36,12 +36,30 @@ export class TodoController {
         type:TodoListDto })
     createTodoList( @Body() req: CreateTodoListDto, @AppContext() appContext: AppContextData) {
         req.userName = appContext.user.userName
-        return this.todoService.createTodoListEvent(req);
+        return this.todoService.createTodoListEvent(req, appContext.user._id);
+    }
+
+    @Put('list')
+    @ApiBearerAuth('authorization')
+    @ApiOkResponse({status:201})
+    @ApiBody({
+        type:TodoListDto })
+    updateTodoList( @Body() req: UpdateTodoListDto, @AppContext() appContext: AppContextData) {
+        return this.todoService.updateTodoListEvent(req, appContext.user._id);
+    }
+
+    @Delete('list')
+    @ApiBearerAuth('authorization')
+    @ApiOkResponse({status:201})
+    @ApiBody({
+        type:TodoListDto })
+    deleteTodoList( @Body() req: UpdateTodoListDto,@AppContext() appContext: AppContextData) {
+        return this.todoService.deleteTodoListEvent(req, appContext.user._id);
     }
 
     @MessagePattern('todo_queue')
     @Public()
-    async handleListCommands(@Payload() req: TodoEventMessage, @Ctx() context: NatsContext) {
+    async handleCommands(@Payload() req: TodoEventMessage, @Ctx() context: NatsContext) {
         console.log('Received message subject:', context.getSubject());
         console.log('Received message data:', req);
         await this.todoService.processCommand(req.payload, req.method)
