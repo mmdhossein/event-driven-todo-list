@@ -9,7 +9,8 @@ export class UserService {
         return this.userModel.findOne({userName: username}).exec()
     }
    async saveUser(user:User){
-        await (new this.userModel(user)).save()
+        await this.userModel.insertMany([user])
     }
+
 
 }

@@ -100,9 +100,6 @@ export class TodoService {
         if (!todoList) {
             throw  new HttpException('todo list not found!', HttpStatus.BAD_REQUEST)
         }
-        if (!todoList.todoItems.filter(item => item._id == req.id)[0]) {
-            throw  new HttpException('todo item not found!', HttpStatus.BAD_REQUEST)
-        }
         req.todoListId = todoList._id
         await this.queueService.publishMessage(process.env.QUEUE_SUBJECT, new TodoEventMessage(TodoCommands.ITEM_DELETE, req))
         return

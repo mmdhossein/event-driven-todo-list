@@ -22,7 +22,7 @@ export class TodoCommandsService {
         @Inject(TodoList.name) private todoListModel: Model<TodoList>,
         @Inject(TodoItem.name) private todoItemModel: Model<TodoItem>,private queryService:TodoQueryService) {
         this.registerTodoCommand(TodoCommands.LIST_CREATE, new CreateTodoList(todoListModel))
-        this.registerTodoCommand(TodoCommands.LIST_DELETE, new DeleteTodoList(todoListModel))
+        this.registerTodoCommand(TodoCommands.LIST_DELETE, new DeleteTodoList(todoListModel, todoItemModel))
         this.registerTodoCommand(TodoCommands.LIST_UPDATE, new UpdateTodoList(todoListModel))
         this.registerTodoCommand(TodoCommands.ITEM_CREATE, new CreateTodoItem(todoListModel, todoItemModel, queryService))
         this.registerTodoCommand(TodoCommands.ITEM_UPDATE, new UpdateTodoItem(todoListModel,todoItemModel, queryService))
@@ -74,12 +74,14 @@ export class UpdateTodoList implements TodoCommand {
 
 export class DeleteTodoList implements TodoCommand {
     constructor(
-        private todoListModel: Model<TodoList>,) {
+        private todoListModel: Model<TodoList>,
+        private todoItemModel: Model<TodoItem>) {
     }
 
 
     async process(req: DeleteTodoListDto) {
         await this.todoListModel.deleteOne({_id: req.id, userId: req.userId})
+        await this.todoItemModel.deleteMany({todoListId:req.id})
         return
     }
 }
@@ -154,13 +156,15 @@ export class DeleteTodoItem implements TodoCommand {
         if (!todoList || !todoList[0]) {
             throw  new Error('todo list not found!')
         }
-        if(!todoList[0].todoItems.filter(item => item._id == req.id)[0]){
+        if(!todoList[0].todoItems.filter(item => {
+            return item._id == req.id
+        })[0]){
             throw  new Error('todo item not found!')
         }
         await this.todoItemModel.deleteOne({_id:req.id})
 
          todoList[0].todoItems.map((item, index, array)=>{
-            if(item == req.id){
+            if(item._id == req.id){
                 array.splice(index, 1)
                 return
             }
