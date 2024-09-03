@@ -1,10 +1,10 @@
-import {Inject, Injectable} from "@nestjs/common";
-import { TodoList} from "./todo.model";
+import {HttpException, HttpStatus, Inject, Injectable} from "@nestjs/common";
+import {TodoItem, TodoList} from "./todo.model";
 import {Model} from "mongoose";
 import {UserService} from "../auth/users/user.service";
 import { QueueService} from "../queue/queue.service";
 import {
-    BaseTodoDto,
+    BaseTodoDto, CreateTodoItemDto,
     CreateTodoListDto,
     DeleteTodoListDto,
     TodoCommands,
@@ -28,11 +28,21 @@ export class TodoService {
         return
     }
 
-    async getTodoLists(userName: string, userId){
-       return  this.queryService.getTodoLists(userName, userId)
+    async getTodoLists(userId){
+       const todoLists:Array<TodoList> =   await this.queryService.getTodoLists(userId)
+        if(todoLists){
+            for(const l of todoLists){
+                l.todoItems = TodoService.orderItemPriority(l.todoItems)
+            }
+        }
+        return todoLists
     }
-
-
+    static orderItemPriority(itemList:Array<TodoItem>){
+        return itemList.sort(function (a, b){return a.priority - b.priority})
+    }
+    static getItemListId(itemList:Array<TodoItem>){
+        return itemList.map((item,) => {return item['_id']})
+    }
 
 
     async createTodoListEvent(req: CreateTodoListDto, userId) {
@@ -42,13 +52,59 @@ export class TodoService {
     }
     async updateTodoListEvent(req: UpdateTodoListDto,userId) {
         req.userId = userId
+        const todoList = await this.queryService.getTodoListsById(req.id, req.userId)
+        if (!todoList || !todoList[0]) {
+            throw  new HttpException('todo list not found!', HttpStatus.BAD_REQUEST)
+        }
         await this.queueService.publishMessage(process.env.QUEUE_SUBJECT, new TodoEventMessage(TodoCommands.LIST_UPDATE, req))
         return
     }
 
     async deleteTodoListEvent(req: DeleteTodoListDto, userId) {
         req.userId = userId
+        const todoList = await this.queryService.getTodoListsById(req.id, req.userId)
+        if (!todoList || !todoList[0]) {
+            throw  new HttpException('todo list not found!', HttpStatus.BAD_REQUEST)
+        }
         await this.queueService.publishMessage(process.env.QUEUE_SUBJECT, new TodoEventMessage(TodoCommands.LIST_DELETE, req))
+        return
+    }
+
+
+    async createItemEvent(req: CreateTodoItemDto, userId) {
+        req.userId = userId
+        const todoList = await this.queryService.getTodoListsById(req.todoListId, req.userId)
+        if (!todoList || !todoList[0]) {
+            throw  new HttpException('todo list not found!', HttpStatus.BAD_REQUEST)
+        }
+        await this.queueService.publishMessage(process.env.QUEUE_SUBJECT, new TodoEventMessage(TodoCommands.ITEM_CREATE, req))
+        return
+    }
+    async updateItemEvent(req: UpdateTodoListDto,userId) {
+        req.userId = userId
+        const todoList = await this.queryService.getTodoListByItemId(req.id, req.userId)
+        req.todoListId =todoList._id
+        if (!todoList) {
+            throw  new HttpException('todo list not found!', HttpStatus.BAD_REQUEST)
+        }
+        if (!todoList.todoItems.filter(item => item._id == req.id)[0]) {
+            throw  new HttpException('todo item not found!', HttpStatus.BAD_REQUEST)
+        }
+        await this.queueService.publishMessage(process.env.QUEUE_SUBJECT, new TodoEventMessage(TodoCommands.ITEM_UPDATE, req))
+        return
+    }
+
+    async deleteItemEvent(req: DeleteTodoListDto, userId) {
+        req.userId = userId
+        const todoList = await this.queryService.getTodoListByItemId(req.id, req.userId)
+        if (!todoList) {
+            throw  new HttpException('todo list not found!', HttpStatus.BAD_REQUEST)
+        }
+        if (!todoList.todoItems.filter(item => item._id == req.id)[0]) {
+            throw  new HttpException('todo item not found!', HttpStatus.BAD_REQUEST)
+        }
+        req.todoListId = todoList._id
+        await this.queueService.publishMessage(process.env.QUEUE_SUBJECT, new TodoEventMessage(TodoCommands.ITEM_DELETE, req))
         return
     }
 

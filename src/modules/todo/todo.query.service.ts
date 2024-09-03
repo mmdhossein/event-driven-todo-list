@@ -1,6 +1,6 @@
 import {TodoItem, TodoList} from "./todo.model";
 import {Inject} from "@nestjs/common";
-import {Model} from "mongoose";
+import mongoose, {Model, } from "mongoose";
 
 export class TodoQueryService {
     constructor(
@@ -8,47 +8,37 @@ export class TodoQueryService {
         @Inject(TodoItem.name) private todoItemModel: Model<TodoItem>) {
     }
 
-    async getTodoLists(userName: string, userId): Promise<Array<TodoList>> {
+    async getTodoLists(userId): Promise<Array<TodoList>> {
         return this.todoListModel.aggregate([{
             $match: {userId: userId}
         },
             {
                 $lookup: {
-                    from: TodoList.name,
-                    localField: "todoListId",
+                    from: 'todoitems',
+                    localField: "todoItems",
                     foreignField: "_id",
                     as: 'todoItems'
                 }
             },
-        ])
+        ]).project({_id:1, todoItems:1, title:1})
     }
 
     async getTodoListsById(id, userId): Promise<Array<TodoList>> {
         return this.todoListModel.aggregate([{
-            $match: {userId: userId}
+            $match: {_id:new mongoose.Types.ObjectId(id), userId:new mongoose.Types.ObjectId(userId)}
         },
             {
                 $lookup: {
-                    from: TodoList.name,
-                    localField: "todoListId",
+                    from: 'todoitems',
+                    localField: "todoItems",
                     foreignField: "_id",
                     as: 'todoItems'
                 }
             },
         ])
     }
-
-    async findAndValidateUserTodoLists(todoListId, userId) {
-        // const todoList = await this.getTodoListsById(todoListId, userId)
-        // if (!todoList || !todoList[0]) {
-        //     throw  new Error('todo list not found!')
-        // }
-        // if (!todoList[0].todoItems.filter(item => item._id == req.id)) {
-        //     throw  new Error('todo item not found!')
-        // }
+    async getTodoListByItemId(id, userId):Promise<TodoList>{
+        return this.todoListModel.findOne({"todoItems":new mongoose.Types.ObjectId(id), userId}).exec()
     }
 
-    async getTodoItem(id) {
-        return this.todoItemModel.findOne({_id: id})
-    }
 }

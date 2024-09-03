@@ -1,7 +1,7 @@
 import {Inject, Injectable} from "@nestjs/common";
 import {TodoItem, TodoList} from "./todo.model";
-import {Model} from "mongoose";
-import {UserService} from "../auth/users/user.service";
+import mongoose, {Model, } from "mongoose";
+
 import {
     BaseTodoDto,
     CreateTodoItemDto,
@@ -11,6 +11,7 @@ import {
     UpdateTodoListDto
 } from "./todo.dto.model";
 import {TodoQueryService} from "./todo.query.service";
+import {TodoService} from "./todo.service";
 export abstract class TodoCommand {
     abstract process(req: BaseTodoDto)
 }
@@ -35,12 +36,6 @@ export class TodoCommandsService {
         this.todoCommandsHandlers[method] = command
     }
 
-    static orderItemPriority(itemList:Array<TodoItem>){
-        return itemList.sort(function (a, b){return a.priority - b.priority})
-    }
-    static getItemListId(itemList:Array<TodoItem>){
-        return itemList.map((item,) => {return item._id})
-    }
 
 
     async processCommand(req: BaseTodoDto, method: number) {
@@ -97,14 +92,16 @@ export class CreateTodoItem implements TodoCommand {
 
     async process(req: CreateTodoItemDto) {
         const todoList = await this.queryService.getTodoListsById(req.todoListId, req.userId)
+        console.log("todoList", todoList)
         if (!todoList || !todoList[0]) {
             throw  new Error('todo list not found!')
         }
         const todoItem = new TodoItem(todoList[0]._id, req.title, req.description, req.priority)
         const todoItemNew =  await this.todoItemModel.insertMany([todoItem])
-        todoItem._id = todoItemNew[0]._id
+        todoItem['_id'] = todoItemNew[0]._id
+        if(!todoList[0].todoItems){todoList[0].todoItems = []}
         todoList[0].todoItems.push(todoItem)
-        const sortedItemIds = TodoCommandsService.getItemListId(TodoCommandsService.orderItemPriority(todoList[0].todoItems))
+        const sortedItemIds = TodoService.getItemListId(TodoService.orderItemPriority(todoList[0].todoItems))
         await this.todoListModel.updateOne({_id:req.todoListId, userId:req.userId}, {$set:{todoItems:sortedItemIds}})
         return
     }
@@ -120,14 +117,14 @@ export class UpdateTodoItem implements TodoCommand {
         if (!todoList || !todoList[0]) {
             throw  new Error('todo list not found!')
         }
-        if(!todoList[0].todoItems.filter(item => item._id == req.id)){
+        if(!todoList[0].todoItems.filter(item => item._id == req.id)[0]){
             throw  new Error('todo item not found!')
         }
         const updateDocument = {}
         if(req.title) {
             Object.assign(updateDocument, {title: req.title})
         }
-        if(req.priority) {
+        if(req.priority != null) {
             Object.assign(updateDocument, {priority: req.priority})
             todoList[0].todoItems.map((item) => {
                 if(item._id == req.id){
@@ -136,7 +133,7 @@ export class UpdateTodoItem implements TodoCommand {
                 }
             })
             console.log('new todo list: ', todoList[0].todoItems)
-            const sortedItemIds = TodoCommandsService.getItemListId(TodoCommandsService.orderItemPriority(todoList[0].todoItems))
+            const sortedItemIds = TodoService.getItemListId(TodoService.orderItemPriority(todoList[0].todoItems))
             await this.todoListModel.updateOne({_id:req.todoListId, userId:req.userId}, {$set:{todoItems:sortedItemIds}})
         }
         if(req.description) {
@@ -157,18 +154,18 @@ export class DeleteTodoItem implements TodoCommand {
         if (!todoList || !todoList[0]) {
             throw  new Error('todo list not found!')
         }
-        if(!todoList[0].todoItems.filter(item => item._id == req.id)){
+        if(!todoList[0].todoItems.filter(item => item._id == req.id)[0]){
             throw  new Error('todo item not found!')
         }
         await this.todoItemModel.deleteOne({_id:req.id})
 
-        const sortedItemIds = todoList[0].todoItems.map((item, index, array)=>{
-            if(item._id == req.id){
+         todoList[0].todoItems.map((item, index, array)=>{
+            if(item == req.id){
                 array.splice(index, 1)
                 return
             }
         })
-        await this.todoListModel.updateOne({_id:req.todoListId, userId:req.userId}, {$set:{todoItems:sortedItemIds}})
+        await this.todoListModel.updateOne({_id:req.todoListId, userId:req.userId}, {$set:{todoItems:todoList[0].todoItems}})
 
         return
     }

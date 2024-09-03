@@ -1,4 +1,5 @@
-import {ApiProperty} from "@nestjs/swagger";
+import {ApiProperty,} from "@nestjs/swagger";
+import {IsNotEmpty} from "class-validator";
 
 export class BaseTodoDto {
     userId
@@ -7,6 +8,7 @@ export class BaseTodoDto {
 export class DeleteTodoListDto extends BaseTodoDto {
     @ApiProperty()
     id: string
+    todoListId
 }
 
 export class CreateTodoListDto extends BaseTodoDto {
@@ -17,20 +19,39 @@ export class CreateTodoListDto extends BaseTodoDto {
 
 export class UpdateTodoListDto extends BaseTodoDto {
     @ApiProperty()
+    @IsNotEmpty()
     id: string
     @ApiProperty()
     title: string
+    todoListId
 }
 
 export class DeleteTodoItemDto extends BaseTodoDto {
     @ApiProperty()
+    @IsNotEmpty()
     id: string
-    @ApiProperty()
     todoListId
 }
 
 export class CreateTodoItemDto extends BaseTodoDto {
     @ApiProperty()
+    @IsNotEmpty()
+    todoListId: string
+    @ApiProperty()
+    @IsNotEmpty()
+    title: string
+    @ApiProperty()
+    @IsNotEmpty()
+    description: string
+    @ApiProperty()
+    @IsNotEmpty()
+    priority: number
+}
+
+export class UpdateTodoItemDto extends BaseTodoDto {
+    @ApiProperty({type:String})
+    @IsNotEmpty()
+    id
     todoListId: string
     @ApiProperty()
     title: string
@@ -38,10 +59,6 @@ export class CreateTodoItemDto extends BaseTodoDto {
     description: string
     @ApiProperty()
     priority: number
-}
-
-export class UpdateTodoItemDto extends CreateTodoItemDto {
-    id
 }
 
 export enum TodoCommands {

@@ -15,8 +15,6 @@ export class TodoItem {
     description: string
     @Prop()
     priority: number
-    @Prop({type:mongoose.Schema.Types.ObjectId})
-    _id
 
 
     constructor(todoListId, title: string, description: string, priority: number) {
@@ -40,10 +38,9 @@ export class TodoList {
     }
 
     @Prop({type:mongoose.Schema.Types.ObjectId,ref: User.name})
-    @ApiProperty({type:mongoose.Schema.Types.ObjectId})
     userId: ObjectId
-    @Prop({ref:TodoItem.name, type:mongoose.Schema.Types.ObjectId})
-    @ApiProperty({type:[mongoose.Schema.Types.ObjectId]})
+    @Prop({type:[mongoose.Schema.Types.ObjectId], ref:TodoItem.name})
+    @ApiProperty()
     todoItems: Array<any> = []
     @Prop({type:String})
     @ApiProperty()
@@ -59,7 +56,7 @@ export class TodoListDto {
 
 
 export class TodoLists{
-    @ApiProperty()
+    @ApiProperty({type:[TodoList]})
     todoList:Array<TodoList>
     constructor(todoList:Array<TodoList>) {
         this.todoList = todoList

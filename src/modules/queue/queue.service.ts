@@ -18,10 +18,6 @@ export class QueueNatsService implements TransportService {
 
     }
 
-    // @MessagePattern('products_queue_1')
-    // getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
-    //     console.log(`Pattern: ${context.getPattern()}`);
-    // }
     public async publishMessage(pattern: string, data: any): Promise<void> {
         const result = await firstValueFrom(this.client.send('test','321'));
         console.log("sending...", pattern, data)

@@ -1,5 +1,5 @@
 {
-  "name": "products",
+  "name": "todo",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -30,6 +30,7 @@
     "@types/multer": "^1.4.12",
     "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.4",
+    "class-validator": "^0.14.1",
     "mongoose": "^8.5.4",
     "nats": "^2.28.2",
     "reflect-metadata": "^0.2.0",
