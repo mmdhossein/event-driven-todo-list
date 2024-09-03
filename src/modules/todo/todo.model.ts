@@ -24,7 +24,7 @@ export const TodoItemSchema = SchemaFactory.createForClass(TodoItem);
 @Schema({})
 export class TodoList {
 
-    constructor(userId, todoItems: Array<ObjectId>=[], title: string) {
+    constructor(userId, todoItems: Array<ObjectId>, title: string) {
         this.userId = userId;
         this.todoItems = todoItems;
         this.title = title;

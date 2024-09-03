@@ -1,19 +1,17 @@
 import {
     Body, Controller,
-    Delete,
     Get,
     HttpCode,
     HttpStatus,
-    Param,
     Post, UseGuards,
 } from "@nestjs/common";
 import {ApiBearerAuth, ApiBody, ApiOkResponse} from "@nestjs/swagger";
 import {AppContext, AppContextData} from "../auth/token/token.model";
 import { TodoListDto, TodoLists} from "./todo.model";
 import {TodoService} from "./todo.service";
-import {CreateTodoListDto} from "./todo.dto.model";
+import { CreateTodoListDto, TodoEventMessage} from "./todo.dto.model";
 import {Public, RolesGuard} from "../../config/guard/guard.auth";
-import {Ctx, EventPattern, MessagePattern, NatsContext, Payload} from "@nestjs/microservices";
+import {Ctx, MessagePattern, NatsContext, Payload} from "@nestjs/microservices";
 
 @Controller('todo')
 @UseGuards(RolesGuard)
@@ -41,11 +39,12 @@ export class TodoController {
         return this.todoService.createTodoListEvent(req);
     }
 
-    @MessagePattern('todo.queue.list')
+    @MessagePattern('todo_queue')
     @Public()
-    async handleListCommands(@Payload() data: any, @Ctx() context: NatsContext) {
+    async handleListCommands(@Payload() req: TodoEventMessage, @Ctx() context: NatsContext) {
         console.log('Received message subject:', context.getSubject());
-        console.log('Received message data:', data);
+        console.log('Received message data:', req);
+        await this.todoService.processCommand(req.payload, req.method)
     }
     // @MessagePattern('todo.queue.list')
     // @Public()

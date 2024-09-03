@@ -49,11 +49,11 @@ export enum TodoCommands {
 }
 
 export class TodoEventMessage {
-    command: TodoCommands
-    data: BaseTodoDto
+    method: TodoCommands
+    payload: BaseTodoDto
 
     constructor(command: TodoCommands, data: BaseTodoDto) {
-        this.command = command;
-        this.data = data;
+        this.method = command;
+        this.payload = data;
     }
 }

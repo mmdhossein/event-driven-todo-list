@@ -12,11 +12,10 @@ async function bootstrap() {
     app.connectMicroservice<MicroserviceOptions>({
         transport: Transport.NATS,
         options: {
-            urls: [process.env.NATS_URL],  queue:'todo'
+            urls: [process.env.NATS_URL],  queue:'todo_queue'
         }
     });
     await app.startAllMicroservices()
-    await app.init()
 
     const config = new DocumentBuilder()
         .setTitle('todo list')
@@ -27,9 +26,10 @@ async function bootstrap() {
         .setVersion('1.0')
         .addTag('')
         .build();
+    app.setGlobalPrefix('api')
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api', app, document);
+    SwaggerModule.setup('swagger', app, document);
+    // await app.init()
     await app.listen(8080);
 }
-
 bootstrap();
