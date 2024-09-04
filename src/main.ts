@@ -6,13 +6,10 @@ import * as nats from "ts-nats";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
-    // const nc = await nats.connect({
-    //     servers: ["nats://localhost:4222"],
-    // })
     app.connectMicroservice<MicroserviceOptions>({
         transport: Transport.NATS,
         options: {
-            urls: [process.env.NATS_URL],  queue:'todo_queue'
+            urls: [process.env.NATS_SERVER],  queue:'todo_queue'
         }
     });
     await app.startAllMicroservices()
@@ -29,7 +26,6 @@ async function bootstrap() {
     app.setGlobalPrefix('api')
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('swagger', app, document);
-    // await app.init()
     await app.listen(8080);
 }
 bootstrap();
