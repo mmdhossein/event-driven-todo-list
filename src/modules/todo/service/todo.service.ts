@@ -10,7 +10,7 @@ import {
     TodoCommands,
     TodoEventMessage,
     UpdateTodoListDto
-} from "../todo.dto.model";
+} from "../model/todo.dto.model";
 import {TodoCommandsService} from "./todo.commands.service";
 import {TodoQueryService} from "./todo.query.service";
 

@@ -9,7 +9,7 @@ import {
     DeleteTodoListDto,
     TodoCommands, UpdateTodoItemDto,
     UpdateTodoListDto
-} from "../todo.dto.model";
+} from "../model/todo.dto.model";
 import {TodoQueryService} from "./todo.query.service";
 import {TodoService} from "./todo.service";
 export abstract class TodoCommand {

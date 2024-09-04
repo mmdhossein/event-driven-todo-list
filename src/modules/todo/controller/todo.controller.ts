@@ -15,7 +15,7 @@ import {
     TodoEventMessage,
     UpdateTodoItemDto,
     UpdateTodoListDto
-} from "../todo.dto.model";
+} from "../model/todo.dto.model";
 import {Public, RolesGuard} from "../../../config/guard/guard.auth";
 import {Ctx, MessagePattern, NatsContext, Payload} from "@nestjs/microservices";
 
