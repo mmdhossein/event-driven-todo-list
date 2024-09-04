@@ -32,7 +32,7 @@ export class QueueService {
 
     constructor(@Inject(QueueNatsService) private transportService: TransportService) {
          nats.connect({
-            servers: ["nats://localhost:4222"],reconnect:true
+            servers: [process.env.NATS_SERVER],reconnect:true
         }).then((nc)=> {
              this.nc = nc
          });
