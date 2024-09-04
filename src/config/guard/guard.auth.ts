@@ -2,8 +2,8 @@ import {CanActivate, ExecutionContext, Injectable, UnauthorizedException} from "
 import {Reflector} from "@nestjs/core";
 import {SetMetadata} from '@nestjs/common';
 import {JwtService} from "@nestjs/jwt";
-import {AppContextData} from "../../modules/auth/token/token.model";
-import {UserService} from "../../modules/auth/users/user.service";
+import {AppContextData} from "../../modules/auth/token/model/token.model";
+import {UserService} from "../../modules/auth/users/service/user.service";
 
 @Injectable()
 export class RolesGuard implements CanActivate {

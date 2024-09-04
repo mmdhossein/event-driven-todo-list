@@ -1,5 +1,5 @@
 import {Inject, Injectable} from "@nestjs/common";
-import {TodoItem, TodoList} from "./todo.model";
+import {TodoItem, TodoList} from "../model/todo.model";
 import mongoose, {Model, } from "mongoose";
 
 import {
@@ -9,7 +9,7 @@ import {
     DeleteTodoListDto,
     TodoCommands, UpdateTodoItemDto,
     UpdateTodoListDto
-} from "./todo.dto.model";
+} from "../todo.dto.model";
 import {TodoQueryService} from "./todo.query.service";
 import {TodoService} from "./todo.service";
 export abstract class TodoCommand {

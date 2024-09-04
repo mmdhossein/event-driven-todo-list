@@ -1,4 +1,4 @@
-import {TodoItem, TodoList} from "./todo.model";
+import {TodoItem, TodoList} from "../model/todo.model";
 import {Inject} from "@nestjs/common";
 import mongoose, {Model, } from "mongoose";
 

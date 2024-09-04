@@ -1,6 +1,6 @@
 import {Inject} from "@nestjs/common";
 import {Model} from "mongoose";
-import {User} from "./user.model";
+import {User} from "../model/user.model";
 
 export class UserService {
     constructor(@Inject(User.name) private userModel: Model<User>) {

@@ -1,6 +1,6 @@
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import {HydratedDocument} from "mongoose";
-import {AuthDto} from "../token/token.model";
+import {AuthDto} from "../../token/model/token.model";
 
 
 @Schema()

@@ -1,8 +1,8 @@
 import {HttpException, HttpStatus, Inject, Injectable} from "@nestjs/common";
-import {TodoItem, TodoList} from "./todo.model";
+import {TodoItem, TodoList} from "../model/todo.model";
 import {Model} from "mongoose";
-import {UserService} from "../auth/users/user.service";
-import { QueueService} from "../queue/queue.service";
+import {UserService} from "../../auth/users/service/user.service";
+import { QueueService} from "../../queue/service/queue.service";
 import {
     BaseTodoDto, CreateTodoItemDto,
     CreateTodoListDto,
@@ -10,7 +10,7 @@ import {
     TodoCommands,
     TodoEventMessage,
     UpdateTodoListDto
-} from "./todo.dto.model";
+} from "../todo.dto.model";
 import {TodoCommandsService} from "./todo.commands.service";
 import {TodoQueryService} from "./todo.query.service";
 

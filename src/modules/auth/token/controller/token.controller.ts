@@ -1,8 +1,8 @@
 import {Body, Controller, HttpCode, HttpStatus, Post} from "@nestjs/common";
 import {ApiBody, ApiOkResponse} from "@nestjs/swagger";
-import { TokenService} from "./token.service";
-import {AuthDto} from "./token.model";
-import {Public} from "../../../config/guard/guard.auth";
+import { TokenService} from "../service/token.service";
+import {AuthDto} from "../model/token.model";
+import {Public} from "../../../../config/guard/guard.auth";
 
 
 @Controller('auth/token')

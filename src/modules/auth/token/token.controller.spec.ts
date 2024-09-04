@@ -1,7 +1,7 @@
 import {Test} from "@nestjs/testing";
-import {TokenService} from "./token.service";
+import {TokenService} from "./service/token.service";
 import {JwtService} from "@nestjs/jwt";
-import {UserService} from "../users/user.service";
+import {UserService} from "../users/service/user.service";
 import { ModuleMocker, MockFunctionMetadata } from 'jest-mock';
 import beforeEach from "node:test";
 const moduleMocker = new ModuleMocker(global);

@@ -6,17 +6,17 @@ import {
     Post, Put, UseGuards,
 } from "@nestjs/common";
 import {ApiBearerAuth, ApiBody, ApiOkResponse} from "@nestjs/swagger";
-import {AppContext, AppContextData} from "../auth/token/token.model";
-import { TodoLists} from "./todo.model";
-import {TodoService} from "./todo.service";
+import {AppContext, AppContextData} from "../../auth/token/model/token.model";
+import { TodoLists} from "../model/todo.model";
+import {TodoService} from "../service/todo.service";
 import {
     CreateTodoItemDto,
     CreateTodoListDto, DeleteTodoItemDto, DeleteTodoListDto,
     TodoEventMessage,
     UpdateTodoItemDto,
     UpdateTodoListDto
-} from "./todo.dto.model";
-import {Public, RolesGuard} from "../../config/guard/guard.auth";
+} from "../todo.dto.model";
+import {Public, RolesGuard} from "../../../config/guard/guard.auth";
 import {Ctx, MessagePattern, NatsContext, Payload} from "@nestjs/microservices";
 
 @Controller('todo')

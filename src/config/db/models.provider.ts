@@ -1,6 +1,6 @@
 import { Connection } from 'mongoose';
-import {User, UserSchema} from "../../modules/auth/users/user.model";
-import {TodoItem, TodoItemSchema, TodoList, TodoListSchema} from "../../modules/todo/todo.model";
+import {User, UserSchema} from "../../modules/auth/users/model/user.model";
+import {TodoItem, TodoItemSchema, TodoList, TodoListSchema} from "../../modules/todo/model/todo.model";
 
 export const modelProviders = [
     {
