@@ -9,7 +9,7 @@ import {QueueModule} from "./modules/queue/queue.module";
 @Module({
     imports: [
         ConfigModule.forRoot({
-            envFilePath: './env/.development.env',
+            envFilePath: './env/.alpha.env',
         }).module,AuthModule,TodoModule,QueueModule,
     ],
     controllers: [],
