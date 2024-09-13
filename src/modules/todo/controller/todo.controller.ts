@@ -17,7 +17,7 @@ import {
     UpdateTodoListDto
 } from "../model/todo.dto.model";
 import {Public, RolesGuard} from "../../../config/guard/guard.auth";
-import {Ctx, MessagePattern, NatsContext, Payload} from "@nestjs/microservices";
+import {Ctx, EventPattern, MessagePattern, NatsContext, Payload} from "@nestjs/microservices";
 
 @Controller('todo')
 @UseGuards(RolesGuard)
@@ -89,7 +89,7 @@ export class TodoController {
     deleteItemList( @Body() req: DeleteTodoItemDto,@AppContext() appContext: AppContextData) {
         return this.todoService.deleteItemEvent(req, appContext.user._id);
     }
-    @MessagePattern('todo_queue')
+    @EventPattern('todo_queue')
     @Public()
     async handleCommands(@Payload() req: TodoEventMessage, @Ctx() context: NatsContext) {
         console.log('Received message subject:', context.getSubject());
